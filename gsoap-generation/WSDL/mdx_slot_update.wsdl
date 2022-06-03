@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WSDL file describing the Slot Update interface of Apollo (SUP) version 5.0 -->
+<!-- The ISD Slot Update document (BC-000178) depends on this file -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns="http://tempuri.org/mdx_slot_update.wsdl" name="MdxUpdateService" targetNamespace="http://tempuri.org/mdx_slot_update.wsdl">
+	<types>
+		<xs:schema targetNamespace="http://tempuri.org/mdx_slot_update.wsdl">
+			<xs:simpleType name="UpdateInterfaceVersionDef">
+				<xs:annotation>
+					<xs:documentation>Specifies the version of the slot update protocol. This version number will be encoded as "major.minor" (excluding the quotes, e.g.: 5.0).</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+			<xs:simpleType name="ErrCodeDef">
+				<xs:annotation>
+					<xs:documentation>All possible error code values that can be returned by the slot.</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="ERR_OK">
+						<xs:annotation>
+							<xs:documentation>No error detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="ERR_INVALID_STATE">
+						<xs:annotation>
+							<xs:documentation>A command was received in the wrong state. Command is ignored.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="ERR_FAILED">
+						<xs:annotation>
+							<xs:documentation>A critical SW or HW failure occurred.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType name="UpdateFailedReasonDef">
+				<xs:annotation>
+					<xs:documentation>Values that indicate why an update failed.</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="NONE">
+						<xs:annotation>
+							<xs:documentation>No failed update.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="CONFIGURATION_NOT_SUPPORTED">
+						<xs:annotation>
+							<xs:documentation>The update failed because the slot hardware configuration is not supported by the updated software.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_SCRIPT_NOT_FOUND">
+						<xs:annotation>
+							<xs:documentation>The update script package is not found in the repository.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="INVALID_UPDATE_SCRIPT">
+						<xs:annotation>
+							<xs:documentation>The received update script package is invalid.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="SOFTWARE_NOT_STARTED">
+						<xs:annotation>
+							<xs:documentation>The update service is unable to start the instrument software.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="SOFTWARE_NOT_STOPPED">
+						<xs:annotation>
+							<xs:documentation>The update service is unable to stop the currently running instrument software.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_INTERRUPTED">
+						<xs:annotation>
+							<xs:documentation>The update failed because the slot was rebooted while it was busy updating.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_SCRIPT_FAILED">
+						<xs:annotation>
+							<xs:documentation>The update script did not execute successfully.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_INTERNAL_ERROR">
+						<xs:annotation>
+							<xs:documentation>An internal error has occurred during the update process.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UNDEFINED">
+						<xs:annotation>
+							<xs:documentation>The update failed due to an undefined problem.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType name="UpdateScriptDef">
+				<xs:annotation>
+					<xs:documentation>The name of the update script installation package. The update script is described in MDx-0900714 Linux Distribution Document.</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+			<xs:simpleType name="UpdateStateDef">
+				<xs:annotation>
+					<xs:documentation>The main state of the update interface of the system.</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="UPDATE_STATE_INITIALISING">
+						<xs:annotation>
+							<xs:documentation>The update interface is initialising, the slot update interface is becoming operational.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_IDLE">
+						<xs:annotation>
+							<xs:documentation>The update interface is idle, i.e. there are no updates busy, failed or completed.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_PREPARING">
+						<xs:annotation>
+							<xs:documentation>The slot update service will shut down the ACP operational interface.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_PREPARE_ERROR">
+						<xs:annotation>
+							<xs:documentation>The slot update service is unable to prepare itself for updating the software.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_IN_PROGRESS">
+						<xs:annotation>
+							<xs:documentation>The slot software is busy updating.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_READY_ERROR">
+						<xs:annotation>
+							<xs:documentation>Updating of the slot software was incomplete or has failed.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="UPDATE_STATE_READY_OK">
+						<xs:annotation>
+							<xs:documentation>Updating of the slot software was successful. The slot must be rebooted for the ACP operational interface to become active again.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:complexType name="SlotVersionDef">
+				<xs:annotation>
+					<xs:documentation>The version of the components of a slot.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="IspVersion" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The version of the Instrument Software Package (ISP).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="IswVersion" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The version of the Instrument Software (ISW).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CfwVersion" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The version of the IO board firmware (CFW).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DfwVersion" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The version of the detector board firmware (DFW).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="HwVersion" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The version of the hardware of the instrument.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="UpdateProgressDef">
+				<xs:annotation>
+					<xs:documentation>The progress of the updating operation. Note that TotalSteps is greater than or equal to CurrentStep.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="CurrentStep">
+						<xs:annotation>
+							<xs:documentation>The current update step.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:int">
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="TotalSteps">
+						<xs:annotation>
+							<xs:documentation>The total number of update steps.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:int">
+								<xs:minInclusive value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="UpdateRequest">
+				<xs:annotation>
+					<xs:documentation>Request to start updating the slot software by executing the update script.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ScriptName" type="ns:UpdateScriptDef">
+							<xs:annotation>
+								<xs:documentation>The update script as described in document MDx-1100312 ISD Slot Update.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateRequestResponse">
+				<xs:annotation>
+					<xs:documentation>Indication whether the request for an update was accepted or not.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateReboot">
+				<xs:annotation>
+					<xs:documentation>Reboot the slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UpdateRebootResponse">
+				<xs:annotation>
+					<xs:documentation>Indication whether the request for a reboot was successful or not.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateGetStatus">
+				<xs:annotation>
+					<xs:documentation>Get the status of the slot update service.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UpdateGetStatusResponse">
+				<xs:annotation>
+					<xs:documentation>Returns the state of the slot update service.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UpdateState" type="ns:UpdateStateDef">
+							<xs:annotation>
+								<xs:documentation>The state of the update interface of the slot.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UpdateProgress" type="ns:UpdateProgressDef">
+							<xs:annotation>
+								<xs:documentation>The progress indication of the update process. Note that this is only valid when the UpdateState is UPDATE_STATE_IN_PROGRESS. In other states it will return step 0 out of a total of 0.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateGetFailedReason">
+				<xs:annotation>
+					<xs:documentation>Get the reason why an update failed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UpdateGetFailedReasonResponse">
+				<xs:annotation>
+					<xs:documentation>Returns the reason why an update failed.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FailedReason" type="ns:UpdateFailedReasonDef">
+							<xs:annotation>
+								<xs:documentation>The reason why an update failed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateGetInterfaceVersion">
+				<xs:annotation>
+					<xs:documentation>Get the slot update protocol version </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UpdateGetInterfaceVersionResponse">
+				<xs:annotation>
+					<xs:documentation>Returns the slot update protocol version</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UpdateInterfaceVersion" type="ns:UpdateInterfaceVersionDef">
+							<xs:annotation>
+								<xs:documentation>The version information</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UpdateGetConfiguration">
+				<xs:annotation>
+					<xs:documentation>Get the software/hardware/firmware configuration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UpdateGetConfigurationResponse">
+				<xs:annotation>
+					<xs:documentation>Returns the software configuration.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Error" type="ns:ErrCodeDef">
+							<xs:annotation>
+								<xs:documentation>Possible Error values returned are a subset:
+ERR_OK
+ERR_FAILED</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SlotVersions" type="ns:SlotVersionDef">
+							<xs:annotation>
+								<xs:documentation>The slot software configuration (for package, software, hardware and firmware) as described in document ISD Slot Update document (BC-000178). In case a version field is empty it indicates that the version for that element is unknown.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</types>
+	<message name="UpdateGetInterfaceVersion">
+		<part name="parameters" element="ns:UpdateGetInterfaceVersion"/>
+	</message>
+	<message name="UpdateGetInterfaceVersionResponse">
+		<part name="parameters" element="ns:UpdateGetInterfaceVersionResponse"/>
+	</message>
+	<message name="UpdateRequest">
+		<part name="parameters" element="ns:UpdateRequest"/>
+	</message>
+	<message name="UpdateRequestResponse">
+		<part name="parameters" element="ns:UpdateRequestResponse"/>
+	</message>
+	<message name="UpdateReboot">
+		<part name="parameters" element="ns:UpdateReboot"/>
+	</message>
+	<message name="UpdateRebootResponse">
+		<part name="parameters" element="ns:UpdateRebootResponse"/>
+	</message>
+	<message name="UpdateGetStatus">
+		<part name="parameters" element="ns:UpdateGetStatus"/>
+	</message>
+	<message name="UpdateGetStatusResponse">
+		<part name="parameters" element="ns:UpdateGetStatusResponse"/>
+	</message>
+	<message name="UpdateGetFailedReason">
+		<part name="parameters" element="ns:UpdateGetFailedReason"/>
+	</message>
+	<message name="UpdateGetFailedReasonResponse">
+		<part name="parameters" element="ns:UpdateGetFailedReasonResponse"/>
+	</message>
+	<message name="UpdateGetConfiguration">
+		<part name="parameters" element="ns:UpdateGetConfiguration"/>
+	</message>
+	<message name="UpdateGetConfigurationResponse">
+		<part name="parameters" element="ns:UpdateGetConfigurationResponse"/>
+	</message>
+	<portType name="ServicePortType">
+		<operation name="UpdateGetInterfaceVersion">
+			<input message="ns:UpdateGetInterfaceVersion"/>
+			<output message="ns:UpdateGetInterfaceVersionResponse"/>
+		</operation>
+		<operation name="UpdateRequest">
+			<input message="ns:UpdateRequest"/>
+			<output message="ns:UpdateRequestResponse"/>
+		</operation>
+		<operation name="UpdateReboot">
+			<input message="ns:UpdateReboot"/>
+			<output message="ns:UpdateRebootResponse"/>
+		</operation>
+		<operation name="UpdateGetStatus">
+			<input message="ns:UpdateGetStatus"/>
+			<output message="ns:UpdateGetStatusResponse"/>
+		</operation>
+		<operation name="UpdateGetFailedReason">
+			<input message="ns:UpdateGetFailedReason"/>
+			<output message="ns:UpdateGetFailedReasonResponse"/>
+		</operation>
+		<operation name="UpdateGetConfiguration">
+			<input message="ns:UpdateGetConfiguration"/>
+			<output message="ns:UpdateGetConfigurationResponse"/>
+		</operation>
+	</portType>
+	<binding name="MdxUpdateService" type="ns:ServicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="UpdateGetInterfaceVersion">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="UpdateRequest">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="UpdateReboot">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="UpdateGetStatus">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="UpdateGetFailedReason">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="UpdateGetConfiguration">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="MdxUpdateService">
+		<port name="MdxUpdateService" binding="ns:MdxUpdateService">
+			<soap:address location="http://MDx:8081"/>
+		</port>
+	</service>
+</definitions>

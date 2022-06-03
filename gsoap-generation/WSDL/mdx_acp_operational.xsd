@@ -1,0 +1,1760 @@
+<xs:schema xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns="http://tempuri.org/mdx_acp_operational.wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://tempuri.org/mdx_acp_operational.wsdl">
+	<xs:simpleType name="SlotACPVersionDef">
+		<xs:annotation>
+			<xs:documentation>The version of the ACP protocol. This version number will be encoded as "major.minor" (excluding the quotes, e.g.: 14.0).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="ErrCodeDef">
+		<xs:annotation>
+			<xs:documentation>Error code values that can be returned by the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ERR_OK">
+				<xs:annotation>
+					<xs:documentation>No error detected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_INVALID_STATE">
+				<xs:annotation>
+					<xs:documentation>A command was received in the wrong state. Command is ignored.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_INVALID_PARAM">
+				<xs:annotation>
+					<xs:documentation>The values of the parameters sent together with the command are incorrect.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_INVALID_CARTRIDGE">
+				<xs:annotation>
+					<xs:documentation>No cartridge present or the barcode of the cartridge could not be read (in case a cartridge was expected) OR a cartridge present (in case no cartridge was expected).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_INVALID_RECIPE">
+				<xs:annotation>
+					<xs:documentation>The recipe is not approved or signed by a trusted party.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_INVALID_METADATA">
+				<xs:annotation>
+					<xs:documentation>The metadata is unavailable.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_BAD_ENVIRONMENTAL_CONDITIONS">
+				<xs:annotation>
+					<xs:documentation>Process can not be started, because environmental conditions (ambient temperature/humidity) are not within the operating range of the instrument.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_CMD_IGNORED">
+				<xs:annotation>
+					<xs:documentation>Command is not executed due to a race condition.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERR_FAILED">
+				<xs:annotation>
+					<xs:documentation>A critical SW or HW failure occured.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MainStateDef">
+		<xs:annotation>
+			<xs:documentation>The main state of the operational interface of the system.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MAIN_STATE_INITIALISING">
+				<xs:annotation>
+					<xs:documentation>The slot is initialising.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MAIN_STATE_OPERATIONAL">
+				<xs:annotation>
+					<xs:documentation>The slot is operational and ready to execute assays.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MAIN_STATE_IN_SERVICE">
+				<xs:annotation>
+					<xs:documentation>The slot is in service mode.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MAIN_STATE_ERROR">
+				<xs:annotation>
+					<xs:documentation>A possibly recoverable error occured. Slot requires a reboot before operation can be resumed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MAIN_STATE_FATAL_ERROR">
+				<xs:annotation>
+					<xs:documentation>A non-recoverable error occured. Slot requires maintenance before operation can be resumed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TrayStateDef">
+		<xs:annotation>
+			<xs:documentation>The tray state of the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TRAY_STATE_CLOSING">
+				<xs:annotation>
+					<xs:documentation>The tray is closing.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_STATE_CLOSED_CARTRIDGE_PRESENT">
+				<xs:annotation>
+					<xs:documentation>Tray is closed, there is a cartridge inside. The barcode has been read. The Console can determine whether the cartridge can be processed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_STATE_CLOSED_NO_CARTRIDGE">
+				<xs:annotation>
+					<xs:documentation>Tray is closed, there is no cartridge inside.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_STATE_OPENING">
+				<xs:annotation>
+					<xs:documentation>The tray is opening.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_STATE_OPENED">
+				<xs:annotation>
+					<xs:documentation>The tray is open. A cartridge (if inserted) can be removed and the tray will be ready for accepting a next cartridge.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_STATE_BLOCKED">
+				<xs:annotation>
+					<xs:documentation>The tray is blocked by an object or a mechanical failure, user action required to continue.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TraySuggestionStateDef">
+		<xs:annotation>
+			<xs:documentation>The state of the Tray Suggestion indicator.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TRAY_SUGGESTION_STATE_OFF">
+				<xs:annotation>
+					<xs:documentation>Tray Suggestion indicator is turned off.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TRAY_SUGGESTION_STATE_ON">
+				<xs:annotation>
+					<xs:documentation>Tray Suggestion indicator is turned on.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SlotIdentificationStateDef">
+		<xs:annotation>
+			<xs:documentation>The state of the slot identification indicator.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SLOT_IDENTIFICATION_STATE_OFF">
+				<xs:annotation>
+					<xs:documentation>Slot identification indicator is turned off.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SLOT_IDENTIFICATION_STATE_ON">
+				<xs:annotation>
+					<xs:documentation>Slot identification indicator is turned on.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProcessStateDef">
+		<xs:annotation>
+			<xs:documentation>The process state of the executing assay.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PROCESS_STATE_IDLE">
+				<xs:annotation>
+					<xs:documentation>Process is ready to start after a valid cartridge has been inserted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_PROCESSING">
+				<xs:annotation>
+					<xs:documentation>The recipe to conduct an assay is being executed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_FINISHING_OK">
+				<xs:annotation>
+					<xs:documentation>Process execution has finished. The slot is being brought back to a well-defined state.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_FINISHING_ABORT">
+				<xs:annotation>
+					<xs:documentation>Process execution is interrupted by an abort. The slot is being brought back to a well-defined state.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_FINISHING_ERROR">
+				<xs:annotation>
+					<xs:documentation>Process execution is interrupted by an error. The slot is being brought back to a well-defined state.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_READY_OK">
+				<xs:annotation>
+					<xs:documentation>Assay completed successfully. Slot is back in a well-defined state. Cartridge may be unloaded. Process results will be saved until the ACP-client has requested these results.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_READY_ABORT">
+				<xs:annotation>
+					<xs:documentation>Assay aborted. Slot is back in a well-defined state. Cartridge may be unloaded. Process results will be saved until the ACP-client has requested these results.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS_STATE_READY_ERROR">
+				<xs:annotation>
+					<xs:documentation>Error occured during assay. Slot is back in a well-defined state. Cartridge may be unloaded. Process results will be saved until the ACP-client has requested these results.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MeasurementStatusDef">
+		<xs:annotation>
+			<xs:documentation>The main state of the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MEASUREMENT_NONE">
+				<xs:annotation>
+					<xs:documentation>No measurement was done for this sample/chamber/channel combination.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MEASUREMENT_OK">
+				<xs:annotation>
+					<xs:documentation>The measurement is done without warnings.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ErrorSeverityDef">
+		<xs:annotation>
+			<xs:documentation>The severity of an error</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WARNING">
+				<xs:annotation>
+					<xs:documentation>WARNING</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR">
+				<xs:annotation>
+					<xs:documentation>ERROR</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FATAL_ERROR">
+				<xs:annotation>
+					<xs:documentation>FATAL_ERROR</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CartridgeIdDef">
+		<xs:annotation>
+			<xs:documentation>The cartridge Id as read by the barcode reader.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CartridgeBatchInfoDef">
+		<xs:annotation>
+			<xs:documentation>The cartridge batch info supplied by the console.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1024"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SampleTypeIdDef">
+		<xs:annotation>
+			<xs:documentation>The sample type identification supplied by the console defined in BC-003637.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int"/>
+	</xs:simpleType>
+	<xs:simpleType name="RecipeIdDef">
+		<xs:annotation>
+			<xs:documentation>The ID of the recipe.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RecipeDef">
+		<xs:annotation>
+			<xs:documentation>The script that contains all the actions to execute an assay. Maximum length of a recipe is 2 MB. Recipes are further described in ISD Apollo Instrument Recipe environment.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="2097152"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ClientCertificateDef">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8192"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OqStatusDef">
+		<xs:annotation>
+			<xs:documentation>OqStatus that can be set to, and returned by the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OQ_REQUIRED">
+				<xs:annotation>
+					<xs:documentation>The slot has not successfully passed any OQ procedure.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OQ_BY_TOOLS">
+				<xs:annotation>
+					<xs:documentation>The slot has successfully passed an OQ procedure that was initiated via the Tools interface.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OQ_BY_ACP">
+				<xs:annotation>
+					<xs:documentation>The slot has successfully passed an OQ procedure that was initiated via the ACP interface.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AssayUpdateDef">
+		<xs:annotation>
+			<xs:documentation>The serialized data that contains assay update message with the maximum length of 1 MB.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1048576"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AssayMetadataDef">
+		<xs:annotation>
+			<xs:documentation>The serialized assay metadata with the maximum length of 1 MB.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1048576"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AmbientTempStatusDef">
+		<xs:annotation>
+			<xs:documentation>The instrument ambient temperature status</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AMBIENT_TEMP_OK">
+				<xs:annotation>
+					<xs:documentation>The instrument ambient temperature is within the operational range</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AMBIENT_TEMP_TOO_HIGH">
+				<xs:annotation>
+					<xs:documentation>The instrument ambient temperature is above the maximal operational temperature of 30 Celsius degree</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AMBIENT_TEMP_TOO_LOW">
+				<xs:annotation>
+					<xs:documentation>The instrument ambient temperature is below the minimal  operational temperature of 15 Celsius degree</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AmbientRhStatusDef">
+		<xs:annotation>
+			<xs:documentation>The instrument ambient relative humidity status</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AMBIENT_RH_OK">
+				<xs:annotation>
+					<xs:documentation>The ambient relative humidity level is within the operational range</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AMBIENT_RH_TOO_HIGH">
+				<xs:annotation>
+					<xs:documentation>The ambient relative humidity level is above the maximal operational level of 80%</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ProcessLogDef">
+		<xs:annotation>
+			<xs:documentation>Actuator and sensor data collected during assay execution.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SlotId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identification of a slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+				<xs:annotation>
+					<xs:documentation>The cartridge used for assay exectution.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipeId" type="ns:RecipeIdDef">
+				<xs:annotation>
+					<xs:documentation>The recipe used to process the cartridge.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProcessStartTime" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>The time of the slot when the processing of an assay started (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Overflowed" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicates if entries have been discarded because the process log was full.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OverflowedCycleNr" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Indicates the first cycle number that was discarded if Overflowed is true.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VariableNames" minOccurs="0" maxOccurs="100">
+				<xs:annotation>
+					<xs:documentation>The names of the variables that are logged in the process log.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The name of the variable that corresponds with this variable index.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Samples" minOccurs="0" maxOccurs="600">
+				<xs:annotation>
+					<xs:documentation>A collection of sets of samples that were sampled from the variables identified in the VariableNames element.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="CycleNr" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>The number of this set of samples.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Timestamp" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The time that has elapsed since the start of the assay process when this set of samples is taken. Time will be formatted as "hh:mm:ss.xxx" (excluding the quotes) where:
+- hh represent the number of hours elapsed since the start of the assay processing
+- mm the number of minutes
+- ss the number of seconds
+- xxx the number of milliseconds.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="VariableValues" minOccurs="0" maxOccurs="100">
+							<xs:annotation>
+								<xs:documentation>The values of the variables sampled at the indicated time. The variable value at index X corresponds to the variable name at index X in the VariableNames element.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Value" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The value the variable sampled at the indicated time.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssayLogDef">
+		<xs:annotation>
+			<xs:documentation>Commands executed during assay execution.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SlotId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identification of a slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+				<xs:annotation>
+					<xs:documentation>The cartridge used for assay exectution.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipeId" type="ns:RecipeIdDef">
+				<xs:annotation>
+					<xs:documentation>The recipe used to process the cartridge.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProcessStartTime" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>The time of the slot when the processing of an assay started (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AssayLogEntry" minOccurs="0" maxOccurs="5000">
+				<xs:annotation>
+					<xs:documentation>An entry in the assay log.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Timestamp" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The time that has passed since the start of the assay processing when this assay function is called. Time will be formatted as "hh:mm:ss.xxx" (excluding the quotes) where:
+- hh represent the number of hours elapsed since the start of the assay processing
+- mm the number of minutes
+- ss the number of seconds
+- xxx the number of milliseconds.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Command" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The name of the command that is executed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ParamEntryCount">
+							<xs:annotation>
+								<xs:documentation>The number of parameters of this command.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="0"/>
+									<xs:maxInclusive value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="ParamEntry" minOccurs="0" maxOccurs="20">
+							<xs:annotation>
+								<xs:documentation>The parameters of the command that is executed.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="ParamName" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Name of the parameter passed with the command.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="ParamValue" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The value of the parameter passed with parameter.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssayResultDef">
+		<xs:annotation>
+			<xs:documentation>Concluded result after the assay execution. The exact content of the AssayResult (AssayResultEntryLevel1 and AssayResultEntryLevel2) will be described in seperate documents since these may vary per assay type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SlotId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identification of a slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+				<xs:annotation>
+					<xs:documentation>The cartridge used for assay exectution.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecipeId" type="ns:RecipeIdDef">
+				<xs:annotation>
+					<xs:documentation>The recipe used to process the cartridge.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProcessStartTime" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>The time of the slot when the processing of an assay started (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Normal" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indication whether this assay result is normal (true) or abnormal (false) in case assay processing was successful. When no assay results are available (i.e. when protocol execution is aborted due to an error or due to a user abort) this field will be false (abnormal).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AssayResultEntryLevel1" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A level 1 entry in the assay results.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>name of Level 1 entry of the AssayResult</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Value" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>value of Level 1 entry of the AssayResult</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AssayResultEntryLevel2" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A level 2 entry in the assay results.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Name" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>name of Level 2 entry of the AssayResult</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="Value" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>value of Level 2 entry of the AssayResult</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RawData2Matrix">
+				<xs:annotation>
+					<xs:documentation>RawData2Matrix of 400 measurements * 5 chambers * 6 colors</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Measurements" minOccurs="400" maxOccurs="400">
+							<xs:annotation>
+								<xs:documentation>The chronological measurements of the detector</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Timestamp" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>The time that has passed since the start of the assay processing when this set of measurements is done. Time will be formatted as "hh:mm:ss.xxx" (excluding the quotes) where:
+- hh represent the number of hours elapsed since the start of the assay processing
+- mm the number of minutes
+- ss the number of seconds
+- xxx the number of milliseconds.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="Chambers" minOccurs="5" maxOccurs="5">
+										<xs:annotation>
+											<xs:documentation>The PCR chambers</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Colors" minOccurs="6" maxOccurs="6">
+													<xs:annotation>
+														<xs:documentation>The detector colors</xs:documentation>
+													</xs:annotation>
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="MeasurementStatus" type="ns:MeasurementStatusDef">
+																<xs:annotation>
+																	<xs:documentation>The status of this measurement.</xs:documentation>
+																</xs:annotation>
+															</xs:element>
+															<xs:element name="Intensity" type="xs:string">
+																<xs:annotation>
+																	<xs:documentation>Intensity of the measurement.</xs:documentation>
+																</xs:annotation>
+															</xs:element>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="CrcData">
+							<xs:annotation>
+								<xs:documentation>The CRC values of all measurements per chamber/color combination</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Chambers" minOccurs="5" maxOccurs="5">
+										<xs:annotation>
+											<xs:documentation>The PCR chambers</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Colors" minOccurs="6" maxOccurs="6">
+													<xs:annotation>
+														<xs:documentation>The detector colors</xs:documentation>
+													</xs:annotation>
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="CrcValue" type="xs:unsignedInt">
+																<xs:annotation>
+																	<xs:documentation>The 32 bit CRC value over all intensities for a single chamber/color combination</xs:documentation>
+																</xs:annotation>
+															</xs:element>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RootCauseErrorId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Root cause error that led to the failing test.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RootCauseRelatedWarningId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Last warning that preceeded the root cause error that led to the failing test.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CartridgeInfoDef">
+		<xs:annotation>
+			<xs:documentation>Information content stored at the cartridge.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+				<xs:annotation>
+					<xs:documentation>Cartridge ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ErrorLogDef">
+		<xs:annotation>
+			<xs:documentation>Information about error(s) occurred.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SlotId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identification of a slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ErrorLogEntry" minOccurs="0" maxOccurs="1000">
+				<xs:annotation>
+					<xs:documentation>An entry in the error log.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Timestamp" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>The date and time of the slot when the warning, error or fatal error was detected (as UTC time). Time will be formatted as "YYYY-MM-DD hh:mm:ss.xxx" (excluding the quotes) where:
+- YYYY represents the year
+- MM represents the month
+- DD represents the day
+- hh represent the hours
+- mm represent the minutes
+- ss represent the seconds
+- xxx represent the milliseconds.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+							<xs:annotation>
+								<xs:documentation>The ID of the cartridge present at the time of the error (or empty if no cartridge was present).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="RecipeId" type="ns:RecipeIdDef">
+							<xs:annotation>
+								<xs:documentation>The ID of the recipe that was being executed at the time of the error (or empty if no recipe was being executed).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ProcessStartTime" type="xs:dateTime">
+							<xs:annotation>
+								<xs:documentation>The time of the slot when the processing of an assay started (as UTC time) (or 00:00:00 1-1-1970 when no assay is being processed).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Severity" type="ns:ErrorSeverityDef">
+							<xs:annotation>
+								<xs:documentation>The severity of the error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Description">
+							<xs:annotation>
+								<xs:documentation>Error description.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="512"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SlotInfoDef">
+		<xs:annotation>
+			<xs:documentation>Information about the slot itself, still an open point.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SlotId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identification of a slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CompanyId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Company who fabricated the slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ManufacturingDate" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Date of manufacturing (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OperatingTime" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Total on time of the system formatted as "dd hh:mm:ss" (excluding the quotes), where
+- dd is the number of days the system has been operating
+- hh the number of hours
+- mm the number of minutes
+- ss the number of seconds.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NrOfAssaysExecuted">
+				<xs:annotation>
+					<xs:documentation>Number of assays executed on the slot.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MaintenanceDueDate" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Date after which maintenance is overdue (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OqStatus" type="ns:OqStatusDef">
+				<xs:annotation>
+					<xs:documentation>OQ status of the slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InstrumentTime" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Current instrument time (as UTC time).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AmbientTemperature" type="xs:double">
+				<xs:annotation>
+					<xs:documentation>Instrument ambient temperature in degrees Celsius</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AmbientHumidity" type="xs:double">
+				<xs:annotation>
+					<xs:documentation>Instrument ambient humidity in percent</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UsageCounterBucketEntryDef">
+		<xs:annotation>
+			<xs:documentation>Defintion for bucket-type usage counter. A bucket interval is ["BucketLowerBound", "BucketUpperBound"). </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="BucketLowerBound" type="xs:string"/>
+			<xs:element name="BucketUpperBound" type="xs:string"/>
+			<xs:element name="BucketValue" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UsageCounterBucketEntryListDef">
+		<xs:sequence>
+			<xs:element name="BucketEntry" type="ns:UsageCounterBucketEntryDef" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UsageCounterOneEntryDef">
+		<xs:annotation>
+			<xs:documentation>Defintion for a single usage counter. Its value's type is either a string or a "UsageCounterBucketEntryListDef"</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="EntryName" type="xs:string"/>
+			<xs:element name="EntryType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="SimpleCounter"/>
+						<xs:enumeration value="BucketCounter"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EntryValueSimpleCounter" type="xs:string" minOccurs="0"/>
+			<xs:element name="EntryValueBucketCounter" type="ns:UsageCounterBucketEntryListDef" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UsageCounterEntryListDef">
+		<xs:annotation>
+			<xs:documentation>Information about the usage counter. "UsageCountersLength" specifies how many entries are included. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="UsageCountersEntries" type="ns:UsageCounterOneEntryDef" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SlotStatusDef">
+		<xs:annotation>
+			<xs:documentation>Status of a slot.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MainState" type="ns:MainStateDef">
+				<xs:annotation>
+					<xs:documentation>The overall state of the slot.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TrayState" type="ns:TrayStateDef">
+				<xs:annotation>
+					<xs:documentation>The tray state. Only meaningful when Mainstate is operational.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProcessState" type="ns:ProcessStateDef">
+				<xs:annotation>
+					<xs:documentation>The process state. Only meaningful when Mainstate is operational.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TraySuggestionState" type="ns:TraySuggestionStateDef">
+				<xs:annotation>
+					<xs:documentation>The tray suggestion state. Only meaningful when Mainstate is operational.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SlotIdentificationState" type="ns:SlotIdentificationStateDef">
+				<xs:annotation>
+					<xs:documentation>The slot identification state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AreEnvironmentalConditionsOk" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Whether the environmental conditions (ambient temperature/humidity) of the instrument are currently within the operating range of the instrument.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsMaintenanceRequired" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Whether the Slot requires Maintenance. When this flag is true, no processes can be started anymore in operational mode. This flag is set to true when the maintenance due date of the slot has been passed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequireSelfDiagnosticTest" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Whether the Slot requires a SelfDiagnosticTest. When this flag is true, the SelfDiagnosticTest of the slot must be started (via the ProcessSelfDiagnosticTestStart command) when it is possible. This flag is set true when the last self-diagnostic test was performed more than 30 days ago</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsRunningSelfDiagnosticTest" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Whether the Slot is currently running the SelfDiagnosticTest. This flag is set to true after the ProcessSelfDiagnosticTestStart command is successful and is reset to false after the process results are acknowledged (with the ProcessAckAssayResult command).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CartridgeProcessingStarted" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Flag indicating whether processing of the cartridge has started. While this flag is false, any cartridge inserted into the tray can still be processed on a slot (the cartridge is not yet docked). When a cartridge is inserted in the tray and the tray is closed, this flag will be reset to false. Just before docking of the cartridge is started, this flag will be set to true. The flag will remain at that value until the tray is opened and closed again with a (new) cartridge. Then the flag is reset to false again.
+This flag should be used to determine whether the cartridge can still be used on another slot if an error occurs after the ProcessStart command has been given.
+Note that this flag is not the same as "Process state beyond Idle"! (in the beginning of the Processing state some pre-work is done which does not use the cartridge yet causing this flag to remain false).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AssayProgress">
+				<xs:annotation>
+					<xs:documentation>Progress information about the running assay. Progress information can be retrieved during any ProcessState.
+
+During PROCESS_STATE_IDLE it returns values 0,0,0,0 for TotalTime, RemainingTime, TotalNrRecipeActions, RecipeActionNr.
+
+During PROCESS_STATE_PROCESSING it returns actual values for TotalTime, RemainingTime, TotalNrRecipeActions, RecipeActionNr. Where TotalTime is greather than or equal to RemainingTime ^ TotalNrRecipeActions is greather than or equal to RecipeActionNr.
+
+During PROCESS_STATE_FINISHING_OK, PROCESS_STATE_FINISHING_ABORT, PROCESS_STATE_FINISHING_ERROR, PROCESS_STATE_READY_OK, PROCESS_STATE_READY_ABORT, PROCESS_STATE_READY_ERROR it returns 0 for RemainingTime, RecipeActionNr == TotalNrRecipeActions and actual values for TotalNrRecipeActions and TotalTime.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RemainingTime">
+							<xs:annotation>
+								<xs:documentation>Remaining time in seconds of the assay execution.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="0"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="TotalTime">
+							<xs:annotation>
+								<xs:documentation>Total time in seconds of the assay execution.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="0"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="RecipeActionNr">
+							<xs:annotation>
+								<xs:documentation>Number of the current action in the recipe.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="0"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="TotalNrRecipeActions">
+							<xs:annotation>
+								<xs:documentation>Total number of actions in the recipe.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="0"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RootCauseErrorId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Returns the error id that describes the root cause of instrument or test failure.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RootCauseRelatedWarningId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Returns the last warning id issued before the failure documented by RootCauseErrorId occurred.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AssayUpdateIsUnread" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicate whether ISW has unread assay update message. Flag is only true if ProcessState is Processing and an assay update message has not been retrieved.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsRunningOqTest" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Whether an instrument is running operational qualification test. The flag is true iff the instrument has started an operational qualification test successfully AND the ProcessState is InProcessing</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AmbientTempState" type="ns:AmbientTempStatusDef">
+				<xs:annotation>
+					<xs:documentation>The instrument ambient temperature state</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AmbientRhState" type="ns:AmbientRhStatusDef">
+				<xs:annotation>
+					<xs:documentation>The instrument ambient relative humidity level</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ProcessAbort">
+		<xs:annotation>
+			<xs:documentation>Request to stop the assay execution.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessAbortResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether the assay execution will be aborted. If so assay results collected so far will be marked abnormal.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_CMD_IGNORED
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessAckAssayResult">
+		<xs:annotation>
+			<xs:documentation>Acknowledgement that the assay results are received and stored on the console.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessAckAssayResultResponse">
+		<xs:annotation>
+			<xs:documentation>The acknowledgement of the receiving and storing of the assay results is processed by the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessGetProcessLog">
+		<xs:annotation>
+			<xs:documentation>Retrieve entries from the process log of the assay that is currently being processed (or the assay of which the processing has just finished). Entries of the process log that are retrieved are removed from the process log.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MaxEntries">
+					<xs:annotation>
+						<xs:documentation>Indicates the maximum number of entries to retrieve from the process log. Less entries may be returned if there are less entries than requested.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:int">
+							<xs:minInclusive value="0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessGetProcessLogResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the process log of the assay that is currently being processed (or the assay of which the processing has just finished).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ProcessLog" type="ns:ProcessLogDef">
+					<xs:annotation>
+						<xs:documentation>The log of the last executed assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessGetAssayLog">
+		<xs:annotation>
+			<xs:documentation>Obtain the assay log of the processed assay.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessGetAssayLogResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the assay log of the processed assay.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AssayLog" type="ns:AssayLogDef">
+					<xs:annotation>
+						<xs:documentation>The log of the last executed assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessGetAssayResult">
+		<xs:annotation>
+			<xs:documentation>Obtain results determined after postprocessing the assay data,</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessGetAssayResultResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the assay results (if available)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AssayResult" type="ns:AssayResultDef">
+					<xs:annotation>
+						<xs:documentation>The results of the last executed assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessGetAssayUpdate">
+		<xs:annotation>
+			<xs:documentation>Obtain the assay update which is set by the processed recipe.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessGetAssayUpdateResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the assay update which is set by the processed recipe.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AssayUpdate" type="ns:AssayUpdateDef">
+					<xs:annotation>
+						<xs:documentation>The last update message set by the recipe.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CrcValue" type="xs:unsignedInt">
+					<xs:annotation>
+						<xs:documentation>The 32-bit CRC value caculated based on update message.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessStart">
+		<xs:annotation>
+			<xs:documentation>Start the execution of an assay.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Recipe" type="ns:RecipeDef">
+					<xs:annotation>
+						<xs:documentation>String containing commands of how to execute an assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Metadata" type="ns:AssayMetadataDef">
+					<xs:annotation>
+						<xs:documentation>String containing base64-encoded assay metadata</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+					<xs:annotation>
+						<xs:documentation>Cartridge to execute assay on.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CartridgeBatchInfo" type="ns:CartridgeBatchInfoDef">
+					<xs:annotation>
+						<xs:documentation>Cartridge batch info to be passed to assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ClientCertificate" type="ns:ClientCertificateDef">
+					<xs:annotation>
+						<xs:documentation>Corresponding client certificate for recipe</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SampleTypeId" type="ns:SampleTypeIdDef">
+					<xs:annotation>
+						<xs:documentation>Sample Type Identification to be passed to assay.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessStartResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether the process could be started.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_INVALID_RECIPE
+ERR_INVALID_METADATA
+ERR_INVALID_CARTRIDGE
+ERR_BAD_ENVIRONMENTAL_CONDITIONS
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessOqTestStart">
+		<xs:annotation>
+			<xs:documentation>This command will start an operational qualification test of the instrument. The test will be executed as a normal assay. During the test, a flag of SlotStatus indicates that the instrument IsRunningOqTest </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="CartridgeId" type="ns:CartridgeIdDef">
+					<xs:annotation>
+						<xs:documentation>String that contains ID of inserted cartridge </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Metadata" type="ns:AssayMetadataDef">
+					<xs:annotation>
+						<xs:documentation>String that contains base-64 encoded metadata for OQ test</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessOqTestStartResponse">
+		<xs:annotation>
+			<xs:documentation>Returns indication whether the operational qualification test has started successfully</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible errors are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_INVALID_CARTRIDGE
+ERR_INVALID_METADATA
+ERR_BAD_ENVIRONMENTAL_CONDITIONS
+ERR_FAILED
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessSelfDiagnosticTestStart">
+		<xs:annotation>
+			<xs:documentation>This command will start the self diagnostic test of the slot. The self diagnostic test will be executed like a normal assay (with the exception that no cartridge may be present in the slot). Once the self diagnostic test is done, the process state will indicate whether the test was successful or not. Additonally, the slot will go to the fatal error state when the self diagnostic test is not successful. During the execution of the self diagnostic test, a flag of the slot status structure will indicate that the slot is performing the self diagnostic test.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ProcessSelfDiagnosticTestStartResponse">
+		<xs:annotation>
+			<xs:documentation>Returns indication whether the self diagnostic test was started successfully.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_INVALID_CARTRIDGE
+ERR_BAD_ENVIRONMENTAL_CONDITIONS
+ERR_CMD_IGNORED
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetErrorLog">
+		<xs:annotation>
+			<xs:documentation>Obtain a number of new entries from the error log. Note that once an entry has been retrieved it will not be retrieved again (the slot keeps track of the last error entry that has been retrieved).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MaxEntries">
+					<xs:annotation>
+						<xs:documentation>Indicates the maximum number of new entries to retrieve from the error log. Less entries may be returned if there are less new entries than requested.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:int">
+							<xs:minInclusive value="0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetErrorLogResponse">
+		<xs:annotation>
+			<xs:documentation>On ERR_OK returns the number of request entries (or less) from the  error log database starting with the last error. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_PARAM
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ErrorLog" type="ns:ErrorLogDef">
+					<xs:annotation>
+						<xs:documentation>The error log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetErrorHistory">
+		<xs:annotation>
+			<xs:documentation>Obtain a number of entries from the error history.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MaxEntries">
+					<xs:annotation>
+						<xs:documentation>Indicates the maximum number of new entries to retrieve from the error history. Less entries may be returned if there are less entries than requested.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:int">
+							<xs:minInclusive value="0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetErrorHistoryResponse">
+		<xs:annotation>
+			<xs:documentation>On ERR_OK returns the number of request entries (or less) from the error history starting with the last error. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_PARAM
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ErrorLog" type="ns:ErrorLogDef">
+					<xs:annotation>
+						<xs:documentation>The error history.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetInfo">
+		<xs:annotation>
+			<xs:documentation>Get information about the type of slot.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotGetInfoResponse">
+		<xs:annotation>
+			<xs:documentation>A response from the server is sent. Parameter "Error" indicates whether the call was executed properly. Information is being sent on ERR_OK.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SlotInfo" type="ns:SlotInfoDef">
+					<xs:annotation>
+						<xs:documentation>Information about the slot.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetStatus">
+		<xs:annotation>
+			<xs:documentation>Get status information of the slot. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotGetStatusResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the status information of the slot.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SlotStatus" type="ns:SlotStatusDef">
+					<xs:annotation>
+						<xs:documentation>The status of a slot.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetACPVersion">
+		<xs:annotation>
+			<xs:documentation>Get the ACP protocol version </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotGetACPVersionResponse">
+		<xs:annotation>
+			<xs:documentation>Returns the ACP protocol version</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SlotACPVersion" type="ns:SlotACPVersionDef">
+					<xs:annotation>
+						<xs:documentation>The version information</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotGetUsageCounter">
+		<xs:annotation>
+			<xs:documentation>Obtain all entries from usage counter.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotGetUsageCounterResponse">
+		<xs:annotation>
+			<xs:documentation>On ERR_OK returns all entries from usage counter. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="UsageCounter" type="ns:UsageCounterEntryListDef">
+					<xs:annotation>
+						<xs:documentation>The usage counter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotSetOqStatus">
+		<xs:annotation>
+			<xs:documentation>Sets the OqStatus of the slot to OQ_BY_ACP.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotSetOqStatusResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether setting the OqStatus has succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotResetOqStatus">
+		<xs:annotation>
+			<xs:documentation>Resets OqStatus of slot to OQ_REQUIRED</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotResetOqStatusResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether reset OqStatus is successful</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrayGetCartridgeInfo">
+		<xs:annotation>
+			<xs:documentation>Obtain information stored on the cartrdige. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TrayGetCartridgeInfoResponse">
+		<xs:annotation>
+			<xs:documentation>On ERR_OK cartridge information is returned. If information cannot be read from the cartridge then ERR_INVALID_CARTRIDGE is returned.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_INVALID_CARTRIDGE
+ERR_CMD_IGNORED
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CartridgeInfo" type="ns:CartridgeInfoDef">
+					<xs:annotation>
+						<xs:documentation>Information about the inserted cartridge.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TraySuggestionDisable">
+		<xs:annotation>
+			<xs:documentation>Disable the suggestion light on the tray.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TraySuggestionDisableResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether disabling the suggestion light on the tray succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_CMD_IGNORED
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TraySuggestionEnable">
+		<xs:annotation>
+			<xs:documentation>Enable the suggestion light on the tray.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TraySuggestionEnableResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether enabling the suggestion light on the tray succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrayOpen">
+		<xs:annotation>
+			<xs:documentation>Open the tray</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TrayOpenResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether the instrument has accepted the request to open the tray</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrayClose">
+		<xs:annotation>
+			<xs:documentation>Close the tray</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TrayCloseResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether the instrument has accepted the request to close the tray</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotIdentificationOn">
+		<xs:annotation>
+			<xs:documentation>Turn the slot identification on. Note that the visual representation of the slot identification takes precedence over other visual representations.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotIdentificationOnResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether turning on the slot identification succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotIdentificationOff">
+		<xs:annotation>
+			<xs:documentation>Turn the slot identification off.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotIdentificationOffResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether turning off the slot identification succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotRecoverFromNonFatalErrors">
+		<xs:annotation>
+			<xs:documentation>Recover the slot from non fatal errors.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotRecoverFromNonFatalErrorsResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether recovering the slot from non fatal errors succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlotRecoverFromErrors">
+		<xs:annotation>
+			<xs:documentation>Recover the slot from all types of errors.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SlotRecoverFromErrorsResponse">
+		<xs:annotation>
+			<xs:documentation>Indication whether recovering the slot from errors succeeded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Error" type="ns:ErrCodeDef">
+					<xs:annotation>
+						<xs:documentation>Possible Error values returned are:
+ERR_OK
+ERR_INVALID_STATE
+ERR_FAILED</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

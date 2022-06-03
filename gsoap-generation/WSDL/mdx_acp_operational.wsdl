@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WSDL file describing Operational interface of Apollo Communication Protocol (ACP) version 14.0 -->
+<!-- the ISD - Apollo Communication Protocol (ACP) document (BC-000177) depends on this file -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ns="http://tempuri.org/mdx_acp_operational.wsdl" name="MdxOperationalService" targetNamespace="http://tempuri.org/mdx_acp_operational.wsdl">
+	<types>
+		<xs:schema targetNamespace="http://tempuri.org/mdx_acp_operational.wsdl">
+			<xs:include schemaLocation="mdx_acp_operational.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="SlotGetACPVersion">
+		<part name="parameters" element="ns:SlotGetACPVersion"/>
+	</message>
+	<message name="SlotGetACPVersionResponse">
+		<part name="parameters" element="ns:SlotGetACPVersionResponse"/>
+	</message>
+	<message name="SlotGetErrorLog">
+		<part name="parameters" element="ns:SlotGetErrorLog"/>
+	</message>
+	<message name="SlotGetErrorLogResponse">
+		<part name="parameters" element="ns:SlotGetErrorLogResponse"/>
+	</message>
+	<message name="SlotGetErrorHistory">
+		<part name="parameters" element="ns:SlotGetErrorHistory"/>
+	</message>
+	<message name="SlotGetErrorHistoryResponse">
+		<part name="parameters" element="ns:SlotGetErrorHistoryResponse"/>
+	</message>
+	<message name="SlotGetInfo">
+		<part name="parameters" element="ns:SlotGetInfo"/>
+	</message>
+	<message name="SlotGetInfoResponse">
+		<part name="parameters" element="ns:SlotGetInfoResponse"/>
+	</message>
+	<message name="SlotGetStatus">
+		<part name="parameters" element="ns:SlotGetStatus"/>
+	</message>
+	<message name="SlotGetStatusResponse">
+		<part name="parameters" element="ns:SlotGetStatusResponse"/>
+	</message>
+	<message name="SlotGetUsageCounter">
+		<part name="parameters" element="ns:SlotGetUsageCounter"/>
+	</message>
+	<message name="SlotGetUsageCounterResponse">
+		<part name="parameters" element="ns:SlotGetUsageCounterResponse"/>
+	</message>
+	<message name="SlotSetOqStatus">
+		<part name="parameters" element="ns:SlotSetOqStatus"/>
+	</message>
+	<message name="SlotSetOqStatusResponse">
+		<part name="parameters" element="ns:SlotSetOqStatusResponse"/>
+	</message>
+	<message name="SlotResetOqStatus">
+		<part name="parameters" element="ns:SlotResetOqStatus"/>
+	</message>
+	<message name="SlotResetOqStatusResponse">
+		<part name="parameters" element="ns:SlotResetOqStatusResponse"/>
+	</message>
+	<message name="ProcessAbort">
+		<part name="parameters" element="ns:ProcessAbort"/>
+	</message>
+	<message name="ProcessAbortResponse">
+		<part name="parameters" element="ns:ProcessAbortResponse"/>
+	</message>
+	<message name="ProcessAckAssayResult">
+		<part name="parameters" element="ns:ProcessAckAssayResult"/>
+	</message>
+	<message name="ProcessAckAssayResultResponse">
+		<part name="parameters" element="ns:ProcessAckAssayResultResponse"/>
+	</message>
+	<message name="ProcessGetProcessLog">
+		<part name="parameters" element="ns:ProcessGetProcessLog"/>
+	</message>
+	<message name="ProcessGetProcessLogResponse">
+		<part name="parameters" element="ns:ProcessGetProcessLogResponse"/>
+	</message>
+	<message name="ProcessGetAssayLog">
+		<part name="parameters" element="ns:ProcessGetAssayLog"/>
+	</message>
+	<message name="ProcessGetAssayLogResponse">
+		<part name="parameters" element="ns:ProcessGetAssayLogResponse"/>
+	</message>
+	<message name="ProcessGetAssayResult">
+		<part name="parameters" element="ns:ProcessGetAssayResult"/>
+	</message>
+	<message name="ProcessGetAssayResultResponse">
+		<part name="parameters" element="ns:ProcessGetAssayResultResponse"/>
+	</message>
+	<message name="ProcessGetAssayUpdate">
+		<part name="parameters" element="ns:ProcessGetAssayUpdate"/>
+	</message>
+	<message name="ProcessGetAssayUpdateResponse">
+		<part name="parameters" element="ns:ProcessGetAssayUpdateResponse"/>
+	</message>
+	<message name="ProcessStart">
+		<part name="parameters" element="ns:ProcessStart"/>
+	</message>
+	<message name="ProcessStartResponse">
+		<part name="parameters" element="ns:ProcessStartResponse"/>
+	</message>
+	<message name="ProcessSelfDiagnosticTestStart">
+		<part name="parameters" element="ns:ProcessSelfDiagnosticTestStart"/>
+	</message>
+	<message name="ProcessSelfDiagnosticTestStartResponse">
+		<part name="parameters" element="ns:ProcessSelfDiagnosticTestStartResponse"/>
+	</message>
+	<message name="ProcessOqTestStart">
+		<part name="parameters" element="ns:ProcessOqTestStart"/>
+	</message>
+	<message name="ProcessOqTestStartResponse">
+		<part name="parameters" element="ns:ProcessOqTestStartResponse"/>
+	</message>
+	<message name="TrayGetCartridgeInfo">
+		<part name="parameters" element="ns:TrayGetCartridgeInfo"/>
+	</message>
+	<message name="TrayGetCartridgeInfoResponse">
+		<part name="parameters" element="ns:TrayGetCartridgeInfoResponse"/>
+	</message>
+	<message name="TraySuggestionDisable">
+		<part name="parameters" element="ns:TraySuggestionDisable"/>
+	</message>
+	<message name="TraySuggestionDisableResponse">
+		<part name="parameters" element="ns:TraySuggestionDisableResponse"/>
+	</message>
+	<message name="TraySuggestionEnable">
+		<part name="parameters" element="ns:TraySuggestionEnable"/>
+	</message>
+	<message name="TraySuggestionEnableResponse">
+		<part name="parameters" element="ns:TraySuggestionEnableResponse"/>
+	</message>
+	<message name="TrayOpen">
+		<part name="parameters" element="ns:TrayOpen"/>
+	</message>
+	<message name="TrayOpenResponse">
+		<part name="parameters" element="ns:TrayOpenResponse"/>
+	</message>
+	<message name="TrayClose">
+		<part name="parameters" element="ns:TrayClose"/>
+	</message>
+	<message name="TrayCloseResponse">
+		<part name="parameters" element="ns:TrayCloseResponse"/>
+	</message>
+	<message name="SlotIdentificationOn">
+		<part name="parameters" element="ns:SlotIdentificationOn"/>
+	</message>
+	<message name="SlotIdentificationOnResponse">
+		<part name="parameters" element="ns:SlotIdentificationOnResponse"/>
+	</message>
+	<message name="SlotIdentificationOff">
+		<part name="parameters" element="ns:SlotIdentificationOff"/>
+	</message>
+	<message name="SlotIdentificationOffResponse">
+		<part name="parameters" element="ns:SlotIdentificationOffResponse"/>
+	</message>
+	<message name="SlotRecoverFromNonFatalErrors">
+		<part name="parameters" element="ns:SlotRecoverFromNonFatalErrors"/>
+	</message>
+	<message name="SlotRecoverFromNonFatalErrorsResponse">
+		<part name="parameters" element="ns:SlotRecoverFromNonFatalErrorsResponse"/>
+	</message>
+	<message name="SlotRecoverFromErrors">
+		<part name="parameters" element="ns:SlotRecoverFromErrors"/>
+	</message>
+	<message name="SlotRecoverFromErrorsResponse">
+		<part name="parameters" element="ns:SlotRecoverFromErrorsResponse"/>
+	</message>
+	<portType name="ServicePortType">
+		<operation name="SlotGetACPVersion">
+			<input message="ns:SlotGetACPVersion"/>
+			<output message="ns:SlotGetACPVersionResponse"/>
+		</operation>
+		<operation name="SlotGetInfo">
+			<input message="ns:SlotGetInfo"/>
+			<output message="ns:SlotGetInfoResponse"/>
+		</operation>
+		<operation name="SlotGetErrorLog">
+			<input message="ns:SlotGetErrorLog"/>
+			<output message="ns:SlotGetErrorLogResponse"/>
+		</operation>
+		<operation name="SlotGetErrorHistory">
+			<input message="ns:SlotGetErrorHistory"/>
+			<output message="ns:SlotGetErrorHistoryResponse"/>
+		</operation>
+		<operation name="SlotGetStatus">
+			<input message="ns:SlotGetStatus"/>
+			<output message="ns:SlotGetStatusResponse"/>
+		</operation>
+		<operation name="SlotSetOqStatus">
+			<input message="ns:SlotSetOqStatus"/>
+			<output message="ns:SlotSetOqStatusResponse"/>
+		</operation>
+		<operation name="SlotResetOqStatus">
+			<input message="ns:SlotResetOqStatus"/>
+			<output message="ns:SlotResetOqStatusResponse"/>
+		</operation>
+		<operation name="SlotGetUsageCounter">
+			<input message="ns:SlotGetUsageCounter"/>
+			<output message="ns:SlotGetUsageCounterResponse"/>
+		</operation>
+		<operation name="ProcessAbort">
+			<input message="ns:ProcessAbort"/>
+			<output message="ns:ProcessAbortResponse"/>
+		</operation>
+		<operation name="ProcessAckAssayResult">
+			<input message="ns:ProcessAckAssayResult"/>
+			<output message="ns:ProcessAckAssayResultResponse"/>
+		</operation>
+		<operation name="ProcessGetProcessLog">
+			<input message="ns:ProcessGetProcessLog"/>
+			<output message="ns:ProcessGetProcessLogResponse"/>
+		</operation>
+		<operation name="ProcessGetAssayLog">
+			<input message="ns:ProcessGetAssayLog"/>
+			<output message="ns:ProcessGetAssayLogResponse"/>
+		</operation>
+		<operation name="ProcessGetAssayResult">
+			<input message="ns:ProcessGetAssayResult"/>
+			<output message="ns:ProcessGetAssayResultResponse"/>
+		</operation>
+		<operation name="ProcessGetAssayUpdate">
+			<input message="ns:ProcessGetAssayUpdate"/>
+			<output message="ns:ProcessGetAssayUpdateResponse"/>
+		</operation>
+		<operation name="ProcessStart">
+			<input message="ns:ProcessStart"/>
+			<output message="ns:ProcessStartResponse"/>
+		</operation>
+		<operation name="ProcessSelfDiagnosticTestStart">
+			<input message="ns:ProcessSelfDiagnosticTestStart"/>
+			<output message="ns:ProcessSelfDiagnosticTestStartResponse"/>
+		</operation>
+		<operation name="ProcessOqTestStart">
+			<input message="ns:ProcessOqTestStart"/>
+			<output message="ns:ProcessOqTestStartResponse"/>
+		</operation>
+		<operation name="TrayGetCartridgeInfo">
+			<input message="ns:TrayGetCartridgeInfo"/>
+			<output message="ns:TrayGetCartridgeInfoResponse"/>
+		</operation>
+		<operation name="TraySuggestionDisable">
+			<input message="ns:TraySuggestionDisable"/>
+			<output message="ns:TraySuggestionDisableResponse"/>
+		</operation>
+		<operation name="TraySuggestionEnable">
+			<input message="ns:TraySuggestionEnable"/>
+			<output message="ns:TraySuggestionEnableResponse"/>
+		</operation>
+		<operation name="TrayOpen">
+			<input message="ns:TrayOpen"/>
+			<output message="ns:TrayOpenResponse"/>
+		</operation>
+		<operation name="TrayClose">
+			<input message="ns:TrayClose"/>
+			<output message="ns:TrayCloseResponse"/>
+		</operation>
+		<operation name="SlotIdentificationOn">
+			<input message="ns:SlotIdentificationOn"/>
+			<output message="ns:SlotIdentificationOnResponse"/>
+		</operation>
+		<operation name="SlotIdentificationOff">
+			<input message="ns:SlotIdentificationOff"/>
+			<output message="ns:SlotIdentificationOffResponse"/>
+		</operation>
+		<operation name="SlotRecoverFromNonFatalErrors">
+			<input message="ns:SlotRecoverFromNonFatalErrors"/>
+			<output message="ns:SlotRecoverFromNonFatalErrorsResponse"/>
+		</operation>
+		<operation name="SlotRecoverFromErrors">
+			<input message="ns:SlotRecoverFromErrors"/>
+			<output message="ns:SlotRecoverFromErrorsResponse"/>
+		</operation>
+	</portType>
+	<binding name="MdxOperationalService" type="ns:ServicePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="SlotGetACPVersion">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotGetErrorLog">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotGetErrorHistory">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotGetInfo">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotGetStatus">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotGetUsageCounter">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotSetOqStatus">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotResetOqStatus">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessAbort">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessAckAssayResult">
+			<soap:operation soapAction="" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"/>
+			<input>
+				<soap:body parts="parameters" use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"/>
+			</output>
+		</operation>
+		<operation name="ProcessGetProcessLog">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessGetAssayLog">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessGetAssayResult">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessGetAssayUpdate">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessStart">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessSelfDiagnosticTestStart">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="ProcessOqTestStart">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="TrayGetCartridgeInfo">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="TraySuggestionDisable">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="TraySuggestionEnable">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="TrayOpen">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="TrayClose">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotIdentificationOn">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotIdentificationOff">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotRecoverFromNonFatalErrors">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+		<operation name="SlotRecoverFromErrors">
+			<soap:operation soapAction=""/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="MdxOperationalService">
+		<port name="MdxOperationalService" binding="ns:MdxOperationalService">
+			<soap:address location="http://MDx:8080"/>
+		</port>
+	</service>
+</definitions>
