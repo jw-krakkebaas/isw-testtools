@@ -1,5 +1,5 @@
 import QtQuick
-import ScanForInstrumentsParameterInput
+import "View"
 
 Window {
     width: 640

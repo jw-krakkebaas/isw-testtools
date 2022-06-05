@@ -1,5 +1,8 @@
 import QtQuick 2.0
 
-Text {
-    text: "hello"
+Item {
+    model : ScanForInstrumentsParameterInputVM {}
+    Text {
+        text: "hello"
+    }
 }

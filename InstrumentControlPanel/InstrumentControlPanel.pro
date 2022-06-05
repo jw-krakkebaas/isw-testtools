@@ -1,12 +1,12 @@
 QT += quick
 
 SOURCES += \
+        ViewModel/scanforinstrumentsparameterinputvm.cpp \
         main.cpp
 
-resources.files = main.qml View/Sc
+resources.files = main.qml View/ScanForInstrumentsParameterInput.qml
 resources.prefix = /$${TARGET}
 RESOURCES += resources \
-    mainresources.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH = View/
@@ -20,3 +20,6 @@ DISTFILES += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+HEADERS += \
+    ViewModel/scanforinstrumentsparameterinputvm.h
