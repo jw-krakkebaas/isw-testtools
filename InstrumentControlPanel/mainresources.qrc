@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/windows">
+        <file>main.qml</file>
+    </qresource>
+    <qresource prefix="/views">
+        <file>View/ScanForInstrumentsParameterInput.qml</file>
+    </qresource>
+</RCC>
