@@ -1,5 +1,6 @@
 import QtQuick
 import "View"
+import InstrumentControlPanel.ViewModel
 
 Window {
     width: 640
@@ -7,7 +8,7 @@ Window {
     visible: true
     title: qsTr("Hello World")  
 
-    ScanForInstrumentsParameterInput {
+    ScanForInstrumentsParameterInput {}
 
-    }
+    Component.onCompleted: ScanForInstrumentsParameterInputVM.loadConfiguration()
 }

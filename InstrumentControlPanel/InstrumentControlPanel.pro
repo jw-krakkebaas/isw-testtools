@@ -1,6 +1,7 @@
-QT += quick
+QT += quick network
 
 SOURCES += \
+        Model/allnetworkadaptersmodel.cpp \
         ViewModel/scanforinstrumentsparameterinputvm.cpp \
         main.cpp
 
@@ -22,4 +23,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Model/allnetworkadaptersmodel.h \
     ViewModel/scanforinstrumentsparameterinputvm.h
